@@ -3,7 +3,9 @@
 
 ## 编译
 使用`Android Studio`打开项目，点击`Make Project`
+
 编译完成后，在`模块名\build\intermediates\cmake\debug\obj\armeabi-v7a\`目录下，
+
 可以找到生成的可执行文件(`victim`)和动态库(`libinject.so`)
 
 ## 测试
@@ -19,6 +21,6 @@
 7. ...
 
 ## 总结
-通过本项目，学习了`GOT Hook`原理以及ELF文件结构，目的已基本达到。虽然功能还不够完善，但短期内应该不会再改进（俗话说得好：不要重复造轮子）。
+通过本项目，学习了`GOT Hook`原理以及ELF文件结构，目的已基本达到。虽然功能还不够完善，但短期内应该不会再改动了（俗话说得好：不要重复造轮子）。
 
 实际应用可以考虑使用字节的[bhook](https://github.com/bytedance/bhook)
