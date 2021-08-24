@@ -1,10 +1,10 @@
 ## Simple Android GOT Hook (ARM)
-实现过程详见：[实现简易Android GOT/PLT Hook (ARM)](https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/)
+详见：[实现简易Android GOT/PLT Hook (ARM)](https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/)
 
 ## 编译
 使用`Android Studio`打开项目，点击`Make Project`
 
-编译完成后，在`模块名\build\intermediates\cmake\debug\obj\armeabi-v7a\`目录下，
+编译完成后，在`模块名/build/intermediates/cmake/debug/obj/armeabi-v7a/`目录下，
 
 可以找到生成的可执行文件(`victim`)和动态库(`libinject.so`)
 
