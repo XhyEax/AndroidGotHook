@@ -17,7 +17,13 @@
 `workdir`文件中包含补丁脚本、adb测试脚本。编译完成后按顺序运行即可
 
 ### 作为动态链接库使用
-app模块是一个例子，`native-lib.cpp`在`JNI_OnLoad`中调用`hackBySegment`替换`gitpid`函数。Java层通过`stringFromJNI`函数通过JNI获取pid。
+app模块是一个例子。
+
+通过配置`CMakeLists.txt`将`libinject.so`作为动态库链接。
+
+在`native-lib.cpp`的`JNI_OnLoad`中调用`hackBySegment`替换`gitpid`函数。
+
+Java层调用`stringFromJNI`函数通过JNI获取pid并显示。
 
 注释`inject.cpp`的构造函数后，编译生成apk，运行即可。（不注释将查找一次`victim-patch`，不影响运行）
 
@@ -30,7 +36,7 @@ app模块是一个例子，`native-lib.cpp`在`JNI_OnLoad`中调用`hackBySegmen
 6. ...
 
 ## 总结
-通过本项目，学习了`GOT Hook`原理，ELF文件结构和导入符号的查找方式，目的已基本达到。虽然功能还不够完善，但短期内应该不会再改动了（这次是真的了）。
+通过本项目，学习了`GOT Hook`原理，ELF文件结构和导入符号的查找方式，目的基本达到。虽然功能还不够完善，但短期内应该不会再改动了（这次是真的了）。
 
 实际应用可以考虑使用字节的[bhook](https://github.com/bytedance/bhook)
 
