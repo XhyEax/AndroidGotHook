@@ -11,7 +11,7 @@
 可以找到生成的可执行文件(`victim`)和动态库(`libinject.so`)
 
 ## 测试
-`workdir`文件中包含补丁脚本、`elf-cleaner`、adb测试脚本。编译完成后按顺序运行即可
+`workdir`文件中包含补丁脚本、adb测试脚本。编译完成后按顺序运行即可
 
 ## 存在的问题
 1. 未绕过`dlopen`命名空间限制，在`Android 7`以上无法打开非公共库
@@ -29,7 +29,6 @@
 ## 参考
 [android中基于plt/got的hook实现原理](https://blog.csdn.net/byhook/article/details/103500524)
 [聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位]([https://linyt.blog.csdn.net/article/details/51636753])
-[WARNING: linker: unsupported flags DT_FLAGS_1=0x8000001](https://github.com/termux/termux-packages/issues/4894)
 [constructor属性函数在动态库加载中的执行顺序](https://zhuanlan.zhihu.com/p/108274829)
 [Android7.0以上命名空间详解(dlopen限制)](https://www.52pojie.cn/thread-948942-1-1.html)
 [Android中GOT表HOOK手动实现](https://blog.csdn.net/u011247544/article/details/78564564)

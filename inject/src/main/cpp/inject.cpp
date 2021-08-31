@@ -56,6 +56,6 @@ void hackDynamic() {
 
 //so加载时自动调用
 void __attribute__((constructor)) __init() {
-//    hack();
-    hackDynamic();
+    hack();
+//    hackDynamic();
 }
