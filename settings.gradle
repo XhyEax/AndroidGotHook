@@ -1,4 +1,4 @@
 rootProject.name = "AndroidGotHook"
-include ':app'
 include ':victim'
 include ':inject'
+include ':app'
