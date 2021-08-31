@@ -17,7 +17,7 @@
 `workdir`文件中包含补丁脚本、adb测试脚本。编译完成后按顺序运行即可
 
 ### 作为动态链接库使用
-app模块是一个例子。
+`victim_app`模块是一个例子。
 
 通过配置`CMakeLists.txt`将`libinject.so`作为动态库链接。
 
