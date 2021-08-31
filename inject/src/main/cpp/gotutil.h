@@ -7,8 +7,11 @@
 
 #include <cstdint>
 
-void getGOTBase(uintptr_t &GOTBase, int &GOTSize, const char *module_path);
+uintptr_t getGOTBase(int &GOTSize, const char *modulePath);
 
-void replaceGOT(uintptr_t GOTBase, int GOTSize, uintptr_t replace, uintptr_t ori);
+uintptr_t getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori);
+
+void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori);
+
 
 #endif //ANDROIDGOTHOOK_GOTUTIL_H

@@ -31,5 +31,5 @@ ext {
     javaVersion = JavaVersion.VERSION_1_8
     ndkVersion = "23.0.7599858"
     cmakeVersion = "3.18.1"
-    abiFilters = "armeabi-v7a"
+    abiFilters = "armeabi-v7a,arm64-v8a"
 }
