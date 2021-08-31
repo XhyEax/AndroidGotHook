@@ -22,11 +22,12 @@ uintptr_t getModuleBase(const char *modulePath) {
     while (fgets(buff, sizeof(buff), fp)) {
         if (strstr(buff, "r-xp") && strstr(buff, modulePath) &&
             sscanf(buff, "%lx", &addr) == 1)
-            break;
+            return addr;
     }
 //    LOGI("buff: %s", buff);
+    LOGI("[%s] moduleBase not found!\n", modulePath);
     fclose(fp);
-    return addr;
+    return 0;
 }
 
 // 解析Section
@@ -81,6 +82,9 @@ static uint32_t elf_sysv_hash(const uint8_t *name) {
 // 解析Segment
 uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
     uintptr_t moduleBase = getModuleBase(modulePath);
+    if (moduleBase == 0) {
+        return 0;
+    }
     LOGI("hackDynamic moduleBase: %lX\n", moduleBase);
     ELFW(Ehdr) elf_header;
     ELFW(Phdr) elf_program_header;

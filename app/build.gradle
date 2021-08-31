@@ -41,3 +41,7 @@ android {
         viewBinding true
     }
 }
+
+dependencies {
+    implementation project(path: ':inject')
+}

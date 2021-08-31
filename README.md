@@ -11,7 +11,12 @@
 可以找到生成的可执行文件(`victim`)和动态库(`libinject.so`)
 
 ## 测试
+### 注入可执行文件
 `workdir`文件中包含补丁脚本、adb测试脚本。编译完成后按顺序运行即可
+## 作为动态链接库使用
+app模块是一个例子，`native-lib.cpp`在`JNI_OnLoad`中调用`hackBySegment`替换`gitpid`函数。Java层通过`stringFromJNI`函数通过JNI获取pid。
+
+注释`inject.cpp`的构造函数后，编译生成apk，运行即可。（不注释将查找一次`victim-patch`，不影响运行）
 
 ## 存在的问题
 1. 未绕过`dlopen`命名空间限制，在`Android 7`以上无法打开非公共库

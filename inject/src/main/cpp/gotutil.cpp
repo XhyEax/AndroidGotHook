@@ -20,7 +20,6 @@ uintptr_t getGOTBase(int &GOTSize, const char *modulePath) {
     uintptr_t GOTBase = 0;
     uintptr_t moduleBase = getModuleBase(modulePath);
     if (moduleBase == 0) {
-        LOGI("moduleBase not found!\n");
         return GOTBase;
     }
     LOGI("hack moduleBase: %lX\n", moduleBase);

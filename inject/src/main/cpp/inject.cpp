@@ -25,8 +25,7 @@ int getpidReplace() {
     return 233333;
 }
 
-
-//so加载时自动调用
+//so加载时由linker调用
 void __attribute__((constructor)) init() {
 //    uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
 //                                  (uintptr_t) getpidReplace);
