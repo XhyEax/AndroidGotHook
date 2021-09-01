@@ -40,6 +40,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        pickFirst '**/libinject.so'
+    }
 }
 
 dependencies {
