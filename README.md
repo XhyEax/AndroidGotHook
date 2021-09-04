@@ -28,7 +28,10 @@ Java层调用`stringFromJNI`函数通过JNI获取pid并显示。
 注释`inject.cpp`的`hack`函数体后，编译生成apk，运行即可。（不注释将查找一次`victim-patch`，不影响运行）
 
 ### 通过JNI加载
-在Java层通过`System.loadLibrary`加载。此时会先调用构造函数，再调用`JNI_OnLoad` (`LoadNativeLibrary`)
+在Java层通过`System.loadLibrary`加载。最终调用到Native层的`LoadNativeLibrary`函数。
+
+其中首先调用`dlopen`加载so(`linker`调用构造函数)。成功后查找`JNI_OnLoad`并调用。
+
 原理见[andorid linker 解读1----从loadLibrary到dlopen](https://bbs.pediy.com/thread-264852.htm)
 
 ## 存在的问题
