@@ -25,7 +25,11 @@
 
 Java层调用`stringFromJNI`函数通过JNI获取pid并显示。
 
-注释`inject.cpp`的构造函数后，编译生成apk，运行即可。（不注释将查找一次`victim-patch`，不影响运行）
+注释`inject.cpp`的`hack`函数体后，编译生成apk，运行即可。（不注释将查找一次`victim-patch`，不影响运行）
+
+### 通过JNI加载
+在Java层通过`System.loadLibrary`加载。此时会先调用构造函数，再调用`JNI_OnLoad` (`LoadNativeLibrary`)
+原理见[andorid linker 解读1----从loadLibrary到dlopen](https://bbs.pediy.com/thread-264852.htm)
 
 ## 存在的问题
 1. 未绕过`dlopen`命名空间限制，在`Android 7`以上无法打开非公共库

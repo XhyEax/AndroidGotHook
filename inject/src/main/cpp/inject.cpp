@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <dlfcn.h>
 #include <android/log.h>
+#include <jni.h>
 
 #include "gotutil.h"
 #include "mylog.h"
@@ -18,18 +19,31 @@ int (*getpidOri)();
 
 // 替换方法
 int getpidReplace() {
-    LOGI("before hook getpid\n");
+    LOGE("before hook getpid\n");
     //调用原方法
     int pid = (int) getpidOri();
-    LOGI("after hook getpid: %d\n", pid);
+    LOGE("after hook getpid: %d\n", pid);
     return 233333;
 }
 
-//so加载时由linker调用
-void __attribute__((constructor)) init() {
-//    uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
+void hack() {
+    //    uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
 //                                  (uintptr_t) getpidReplace);
     uintptr_t ori = hackBySegment(MODULE_PATH, "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
     getpidOri = (int (*)()) (ori);
+}
+
+//so加载时由linker调用
+void __attribute__((constructor)) init() {
+    LOGE("call from constructor\n");
+    hack();
+}
+
+// JNI LoadNativeLibrary中调用
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    if (NULL == vm) return JNI_ERR;
+    LOGE("call from JNI_OnLoad\n");
+    hack();
+    return JNI_VERSION_1_6;
 }

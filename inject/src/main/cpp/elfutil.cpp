@@ -21,11 +21,13 @@ uintptr_t getModuleBase(const char *modulePath) {
     FILE *fp = fopen("/proc/self/maps", "r");
     while (fgets(buff, sizeof(buff), fp)) {
         if (strstr(buff, "r-xp") && strstr(buff, modulePath) &&
-            sscanf(buff, "%lx", &addr) == 1)
+            sscanf(buff, "%lx", &addr) == 1) {
+            LOGE("[%s] moduleBase: %lX\n", modulePath, addr);
             return addr;
+        }
     }
-//    LOGI("buff: %s", buff);
-    LOGI("[%s] moduleBase not found!\n", modulePath);
+//    LOGE("buff: %s", buff);
+    LOGE("[%s] moduleBase not found!\n", modulePath);
     fclose(fp);
     return 0;
 }
@@ -41,8 +43,8 @@ int getGOTOffsetAndSize(const char *modulePath, int &GOTSize) {
     // 解析elf_header
     fseek(fp, 0, SEEK_SET);
     fread(&elf_header, sizeof(elf_header), 1, fp);
-//    LOGI("elf_header e_shoff: %lX, e_shstrndx: %d", elf_header.e_shoff, elf_header.e_shstrndx);
-//    LOGI("elf_header e_shnum: %d", elf_header.e_shnum);
+//    LOGE("elf_header e_shoff: %lX, e_shstrndx: %d", elf_header.e_shoff, elf_header.e_shstrndx);
+//    LOGE("elf_header e_shnum: %d", elf_header.e_shnum);
     // 获取字符串表在section header中的偏移
     fseek(fp, elf_header.e_shoff + elf_header.e_shstrndx * elf_header.e_shentsize, SEEK_SET);
     fread(&elf_section_header, sizeof(elf_section_header), 1, fp);
@@ -85,15 +87,14 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
     if (moduleBase == 0) {
         return 0;
     }
-    LOGI("hackDynamic moduleBase: %lX\n", moduleBase);
     ELFW(Ehdr) elf_header;
     ELFW(Phdr) elf_program_header;
     memset(&elf_header, 0, sizeof(elf_header));
     memset(&elf_program_header, 0, sizeof(elf_program_header));
     // 解析elf_header
     memcpy(&elf_header, (const void *) moduleBase, sizeof(elf_header));
-//    LOGI("elf_header e_phoff: %lX, e_phentsize: %d", elf_header.e_phoff, elf_header.e_phentsize);
-//    LOGI("elf_header e_phnum: %d", elf_header.e_phnum);
+//    LOGE("elf_header e_phoff: %lX, e_phentsize: %d", elf_header.e_phoff, elf_header.e_phentsize);
+//    LOGE("elf_header e_phnum: %d", elf_header.e_phnum);
     // 遍历program header table, 查找.dynamic
     int DYNOffset = 0;
     int DYNSize = 0;
@@ -108,11 +109,11 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         }
     }
     if (DYNOffset == 0 || DYNSize == 0) {
-        LOGI(".dynamic not found!");
+        LOGE(".dynamic not found!");
         return 0;
     }
     uintptr_t DYNBase = moduleBase + DYNOffset;
-    LOGI("DYNOffset: %lX DYNBase: %lX DYNSize: %lX", DYNOffset, DYNBase, DYNSize);
+    LOGE("DYNOffset: %lX DYNBase: %lX DYNSize: %lX", DYNOffset, DYNBase, DYNSize);
 
     // 保存各表
     ELFW(Sym) *dynsym;
@@ -178,7 +179,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         }
     }
     if (!target) {
-        LOGI("target sym not found!");
+        LOGE("target sym not found!");
         return 0;
     }
     //遍历 .rel.plt 和 .rel.dyn，获取偏移，计算内存地址
@@ -186,7 +187,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         ELFW(Rel) &rel = rel_plt[i];
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             ELF_R_TYPE(rel.r_info) == ELF_R_JUMP_SLOT) {
-//            LOGI("target r_offset: %lX", rel.r_offset);
+//            LOGE("target r_offset: %lX", rel.r_offset);
             return moduleBase + rel.r_offset;
         }
     }
@@ -195,7 +196,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             (ELF_R_TYPE(rel.r_info) == ELF_R_ABS
              || ELF_R_TYPE(rel.r_info) == ELF_R_GLOB_DAT)) {
-//            LOGI("target r_offset: %lX", rel.r_offset);
+//            LOGE("target r_offset: %lX", rel.r_offset);
             return moduleBase + rel.r_offset;
         }
     }
