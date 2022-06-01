@@ -79,11 +79,11 @@ void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori) {
 // 基于链接视图解析ELF
 uintptr_t hackBySection(const char *module_name, const char *target_lib, const char *target_func,
                         uintptr_t replace) {
-    LOGE("hack start.\n");
+    LOGE("hackBySection start.\n");
     // 获取目标函数地址
     void *handle = dlopen(target_lib, RTLD_LAZY);
     auto ori = (uintptr_t) dlsym(handle, target_func);
-    LOGE("hack ori addr: %lx\n", ori);
+    LOGE("ori addr: %lx\n", ori);
     int GOTSize = 0;
     // 获取GOT表地址及大小 (解析Section)
     uintptr_t GOTBase = getGOTBase(GOTSize, module_name);
@@ -97,11 +97,11 @@ uintptr_t hackBySection(const char *module_name, const char *target_lib, const c
 // 基于执行视图解析ELF
 uintptr_t hackBySegment(const char *module_name, const char *target_lib, const char *target_func,
                         uintptr_t replace) {
-    LOGE("hackDynamic start.\n");
+    LOGE("hackBySegment start.\n");
     // 获取目标函数地址
     void *handle = dlopen(target_lib, RTLD_LAZY);
     auto ori = (uintptr_t) dlsym(handle, target_func);
-    LOGE("hackDynamic ori addr: %lx\n", ori);
+    LOGE("ori addr: %lx\n", ori);
     // 获取符号地址 (解析Segment)
     uintptr_t replaceAddr = getSymAddrDynamic(module_name, target_func);
     // 替换地址

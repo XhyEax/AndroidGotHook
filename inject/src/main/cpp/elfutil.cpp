@@ -14,23 +14,22 @@
 #include "mylog.h"
 
 
-uintptr_t getModuleBase(const char *modulePath, char *moduleFullPath) {
+uintptr_t getModuleBase(const char *module_name, char *moduleFullPath) {
     uintptr_t addr = 0;
     char buff[256] = "\n";
-    uintptr_t end, inode, foo;
-    char perm[5], dev[6];
 
     FILE *fp = fopen("/proc/self/maps", "r");
     while (fgets(buff, sizeof(buff), fp)) {
-        if (strstr(buff, "r-xp") && strstr(buff, modulePath) &&
-            sscanf(buff, "%lx-%lx %4s %lx %5s %ld %s",
-                   &addr, &end, perm, &foo, dev, &inode, moduleFullPath) == 7) {
+        if (strstr(buff, "r-xp") && strstr(buff, module_name) &&
+            sscanf(buff, "%lx", &addr) == 1) {
+            strcpy(moduleFullPath, strchr(buff, '/'));
+            moduleFullPath[strlen(moduleFullPath) - 1] = 0x0;
             LOGE("[%s] moduleBase: %lx\n", moduleFullPath, addr);
             return addr;
         }
     }
 //    LOGE("buff: %s", buff);
-    LOGE("[%s] moduleBase not found!\n", modulePath);
+    LOGE("[%s] moduleBase not found!\n", module_name);
     fclose(fp);
     return 0;
 }

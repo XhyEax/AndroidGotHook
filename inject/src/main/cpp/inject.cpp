@@ -27,8 +27,7 @@ int getpidReplace() {
 }
 
 void hack() {
-//    uintptr_t ori = hackBySection(MODULE_NAME, "libc.so", "getpid",
-//                                  (uintptr_t) getpidReplace);
+    // hackBySection or hackBySegment
     uintptr_t ori = hackBySegment(MODULE_NAME, "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
     getpidOri = (int (*)()) (ori);
