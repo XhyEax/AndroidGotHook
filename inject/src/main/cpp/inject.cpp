@@ -9,9 +9,9 @@
 #include "gotutil.h"
 
 #if defined(__LP64__)
-#define MODULE_PATH "victim-patch-arm64"
+#define MODULE_NAME "victim-patch-arm64"
 #else
-#define MODULE_PATH "victim-patch-arm"
+#define MODULE_NAME "victim-patch-arm"
 #endif
 
 // 原方法的备份
@@ -27,9 +27,9 @@ int getpidReplace() {
 }
 
 void hack() {
-//    uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
+//    uintptr_t ori = hackBySection(MODULE_NAME, "libc.so", "getpid",
 //                                  (uintptr_t) getpidReplace);
-    uintptr_t ori = hackBySegment(MODULE_PATH, "libc.so", "getpid",
+    uintptr_t ori = hackBySegment(MODULE_NAME, "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
     getpidOri = (int (*)()) (ori);
 }
@@ -42,7 +42,7 @@ void __attribute__((constructor)) init() {
 
 // JNI LoadNativeLibrary中调用
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    if (NULL == vm) return JNI_ERR;
+    if (nullptr == vm) return JNI_ERR;
     LOGE("call from JNI_OnLoad\n");
     hack();
     return JNI_VERSION_1_6;
