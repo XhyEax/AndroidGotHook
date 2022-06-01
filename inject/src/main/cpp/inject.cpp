@@ -38,6 +38,7 @@ void hack() {
 void __attribute__((constructor)) init() {
     LOGE("call from constructor\n");
     hack();
+    LOGE("constructor finish.\n");
 }
 
 // JNI LoadNativeLibrary中调用

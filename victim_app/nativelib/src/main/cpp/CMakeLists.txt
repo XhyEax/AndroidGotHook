@@ -43,7 +43,7 @@ find_library( # Sets the name of the path variable.
 set(INJECT_BASE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../inject)
 add_library(inject SHARED IMPORTED)
 set_target_properties(inject PROPERTIES
-        IMPORTED_LOCATION ${INJECT_BASE}/build/intermediates/stripped_native_libs/debug/out/lib/${ANDROID_ABI}/libinject.so
+        IMPORTED_LOCATION ${INJECT_BASE}/build/intermediates/merged_native_libs/debug/out/lib/${ANDROID_ABI}/libinject.so
         INTERFACE_INCLUDE_DIRECTORIES ${INJECT_BASE}/src/main/cpp/include)
 
 include_directories(${INJECT_BASE}/src/main/cpp/include)
