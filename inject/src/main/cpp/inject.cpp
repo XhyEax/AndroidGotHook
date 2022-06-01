@@ -9,9 +9,9 @@
 #include "gotutil.h"
 
 #if defined(__LP64__)
-#define MODULE_PATH "/data/local/tmp/victim-patch-arm64"
+#define MODULE_PATH "victim-patch-arm64"
 #else
-#define MODULE_PATH "/data/local/tmp/victim-patch-arm"
+#define MODULE_PATH "victim-patch-arm"
 #endif
 
 // 原方法的备份
@@ -27,10 +27,10 @@ int getpidReplace() {
 }
 
 void hack() {
-    //    uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
-//                                  (uintptr_t) getpidReplace);
-    uintptr_t ori = hackBySegment(MODULE_PATH, "libc.so", "getpid",
+        uintptr_t ori = hackBySection(MODULE_PATH, "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
+//    uintptr_t ori = hackBySegment(MODULE_PATH, "libc.so", "getpid",
+//                                  (uintptr_t) getpidReplace);
     getpidOri = (int (*)()) (ori);
 }
 

@@ -89,9 +89,9 @@ static uint32_t elf_sysv_hash(const uint8_t *name) {
 }
 
 // 解析Segment
-uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
+uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
     char moduleFullPath[256] = {0};
-    uintptr_t moduleBase = getModuleBase(modulePath, moduleFullPath);
+    uintptr_t moduleBase = getModuleBase(module_name, moduleFullPath);
     if (moduleBase == 0) {
         return 0;
     }
