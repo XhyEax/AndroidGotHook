@@ -14,15 +14,18 @@
 #include "mylog.h"
 
 
-uintptr_t getModuleBase(const char *modulePath) {
+uintptr_t getModuleBase(const char *modulePath, char *moduleFullPath) {
     uintptr_t addr = 0;
     char buff[256] = "\n";
+    uintptr_t end, inode, foo;
+    char perm[5], dev[6];
 
     FILE *fp = fopen("/proc/self/maps", "r");
     while (fgets(buff, sizeof(buff), fp)) {
         if (strstr(buff, "r-xp") && strstr(buff, modulePath) &&
-            sscanf(buff, "%lx", &addr) == 1) {
-            LOGE("[%s] moduleBase: %lX\n", modulePath, addr);
+            sscanf(buff, "%lx-%lx %4s %lx %5s %ld %s",
+                   &addr, &end, perm, &foo, dev, &inode, moduleFullPath) == 7) {
+            LOGE("[%s] moduleBase: %lx\n", moduleFullPath, addr);
             return addr;
         }
     }
@@ -36,6 +39,10 @@ uintptr_t getModuleBase(const char *modulePath) {
 int getGOTOffsetAndSize(const char *modulePath, int &GOTSize) {
     int GOTOffset = 0;
     FILE *fp = fopen(modulePath, "r");
+    if (!fp) {
+        LOGE("[%s] open failed!", modulePath);
+        return 0;
+    }
     ELFW(Ehdr) elf_header;
     ELFW(Shdr) elf_section_header;
     memset(&elf_header, 0, sizeof(elf_header));
@@ -43,7 +50,7 @@ int getGOTOffsetAndSize(const char *modulePath, int &GOTSize) {
     // 解析elf_header
     fseek(fp, 0, SEEK_SET);
     fread(&elf_header, sizeof(elf_header), 1, fp);
-//    LOGE("elf_header e_shoff: %lX, e_shstrndx: %d", elf_header.e_shoff, elf_header.e_shstrndx);
+//    LOGE("elf_header e_shoff: %lx, e_shstrndx: %d", elf_header.e_shoff, elf_header.e_shstrndx);
 //    LOGE("elf_header e_shnum: %d", elf_header.e_shnum);
     // 获取字符串表在section header中的偏移
     fseek(fp, elf_header.e_shoff + elf_header.e_shstrndx * elf_header.e_shentsize, SEEK_SET);
@@ -83,7 +90,8 @@ static uint32_t elf_sysv_hash(const uint8_t *name) {
 
 // 解析Segment
 uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
-    uintptr_t moduleBase = getModuleBase(modulePath);
+    char moduleFullPath[256] = {0};
+    uintptr_t moduleBase = getModuleBase(modulePath, moduleFullPath);
     if (moduleBase == 0) {
         return 0;
     }
@@ -93,7 +101,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
     memset(&elf_program_header, 0, sizeof(elf_program_header));
     // 解析elf_header
     memcpy(&elf_header, (const void *) moduleBase, sizeof(elf_header));
-//    LOGE("elf_header e_phoff: %lX, e_phentsize: %d", elf_header.e_phoff, elf_header.e_phentsize);
+//    LOGE("elf_header e_phoff: %lx, e_phentsize: %d", elf_header.e_phoff, elf_header.e_phentsize);
 //    LOGE("elf_header e_phnum: %d", elf_header.e_phnum);
     // 遍历program header table, 查找.dynamic
     int DYNOffset = 0;
@@ -113,7 +121,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         return 0;
     }
     uintptr_t DYNBase = moduleBase + DYNOffset;
-    LOGE("DYNOffset: %lX DYNBase: %lX DYNSize: %lX", DYNOffset, DYNBase, DYNSize);
+    LOGE("DYNOffset: %lx DYNBase: %lx DYNSize: %lx", DYNOffset, DYNBase, DYNSize);
 
     // 保存各表
     ELFW(Sym) *dynsym;
@@ -187,7 +195,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         ELFW(Rel) &rel = rel_plt[i];
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             ELF_R_TYPE(rel.r_info) == ELF_R_JUMP_SLOT) {
-//            LOGE("target r_offset: %lX", rel.r_offset);
+//            LOGE("target r_offset: %lx", rel.r_offset);
             return moduleBase + rel.r_offset;
         }
     }
@@ -196,7 +204,7 @@ uintptr_t getSymAddrDynamic(const char *modulePath, const char *symName) {
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             (ELF_R_TYPE(rel.r_info) == ELF_R_ABS
              || ELF_R_TYPE(rel.r_info) == ELF_R_GLOB_DAT)) {
-//            LOGE("target r_offset: %lX", rel.r_offset);
+//            LOGE("target r_offset: %lx", rel.r_offset);
             return moduleBase + rel.r_offset;
         }
     }
