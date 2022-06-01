@@ -5,7 +5,6 @@ plugins {
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-    ndkVersion rootProject.ext.ndkVersion
 
     defaultConfig {
         applicationId "com.xhy.androidgothook"
@@ -14,9 +13,11 @@ android {
         versionCode 1
         versionName "1.0"
 
-        externalNativeBuild {
-            cmake {
-                abiFilters rootProject.ext.abiFilters.split(",")
+        android {
+            defaultConfig {
+                ndk {
+                    abiFilters rootProject.ext.abiFilters.split(",")
+                }
             }
         }
     }
@@ -46,5 +47,5 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':inject')
+    implementation project(path: ':victim_app:nativelib')
 }

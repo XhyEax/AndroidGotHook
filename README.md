@@ -50,7 +50,7 @@ Java层调用`stringFromJNI`函数通过JNI获取pid并显示。
 ## 参考
 [android中基于plt/got的hook实现原理](https://blog.csdn.net/byhook/article/details/103500524)
 
-[聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位]([https://linyt.blog.csdn.net/article/details/51636753])
+[聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位](https://linyt.blog.csdn.net/article/details/51636753)
 
 [constructor属性函数在动态库加载中的执行顺序](https://zhuanlan.zhihu.com/p/108274829)
 

@@ -2,3 +2,4 @@ rootProject.name = "AndroidGotHook"
 include ':victim'
 include ':inject'
 include ':victim_app'
+include ':victim_app:nativelib'
