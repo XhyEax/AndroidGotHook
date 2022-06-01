@@ -14,6 +14,12 @@
 #include "elfutil.h"
 #include "mylog.h"
 
+void getFullPath(const char *src, char *dest) {
+    while (*src != '/') {
+        *src++;
+    }
+    strncpy(dest, src, strlen(src) - 1);
+}
 
 uintptr_t getModuleBase(const char *module_name, char *moduleFullPath) {
     uintptr_t addr = 0;
@@ -23,8 +29,7 @@ uintptr_t getModuleBase(const char *module_name, char *moduleFullPath) {
     while (fgets(buff, sizeof(buff), fp)) {
         if (strstr(buff, "r-xp") && strstr(buff, module_name) &&
             sscanf(buff, "%" SCNxPTR, &addr) == 1) {
-            strcpy(moduleFullPath, strchr(buff, '/'));
-            moduleFullPath[strlen(moduleFullPath) - 1] = 0x0;
+            getFullPath(buff, moduleFullPath);
             LOGE("[%s] moduleBase: %" SCNxPTR, moduleFullPath, addr);
             return addr;
         }
