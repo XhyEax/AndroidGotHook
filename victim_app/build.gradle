@@ -32,12 +32,7 @@ android {
         sourceCompatibility rootProject.ext.javaVersion
         targetCompatibility rootProject.ext.javaVersion
     }
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
-            version rootProject.ext.cmakeVersion
-        }
-    }
+
     buildFeatures {
         viewBinding true
     }
