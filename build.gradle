@@ -24,12 +24,12 @@ task clean(type: Delete) {
 }
 
 ext {
-    minSdkVersion = 16
+    minSdkVersion = 21
     compileSdkVersion = 31
     targetSdkVersion = 31
     buildToolsVersion = "31.0.0"
     ndkVersion = "24.0.8215888"
-    javaVersion = JavaVersion.VERSION_1_8
     cmakeVersion = "3.18.1"
     abiFilters = "armeabi-v7a,arm64-v8a"
+    javaVersion = JavaVersion.VERSION_1_8
 }
