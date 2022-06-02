@@ -37,7 +37,9 @@ android {
         viewBinding true
     }
     packagingOptions {
-        pickFirst '**/libinject.so'
+        jniLibs {
+            pickFirsts += ['**/libinject.so']
+        }
     }
 }
 
