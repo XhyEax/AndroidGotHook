@@ -14,14 +14,16 @@
 #define MODULE_NAME "victim-patch-arm"
 #endif
 
+typedef int (*getpid_fun)();
+
 // 原方法的备份
-int (*getpidOri)();
+getpid_fun getpidOri;
 
 // 替换方法
 int getpidReplace() {
     LOGE("before hook getpid\n");
     //调用原方法
-    int pid = (int) getpidOri();
+    int pid = getpidOri();
     LOGE("after hook getpid: %d\n", pid);
     return 233333;
 }
@@ -30,7 +32,7 @@ void hack() {
     // hackBySection or hackBySegment
     uintptr_t ori = hackBySegment(MODULE_NAME, "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
-    getpidOri = (int (*)()) (ori);
+    getpidOri = (getpid_fun) ori;
 }
 
 //so加载时由linker调用
