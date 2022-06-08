@@ -91,7 +91,7 @@ uintptr_t hackBySection(const char *module_name, const char *target_lib, const c
     // 获取目标函数地址
     void *handle = dlopen(target_lib, RTLD_LAZY);
     auto ori = (uintptr_t) dlsym(handle, target_func);
-    LOGE("ori addr: %" SCNxPTR "\n", ori);
+//    LOGE("ori addr: %" SCNxPTR "\n", ori);
     int GOTSize = 0;
     // 获取GOT表地址及大小 (解析Section)
     uintptr_t GOTBase = getGOTBase(GOTSize, module_name);
@@ -113,7 +113,7 @@ uintptr_t hackBySegment(const char *module_name, const char *target_lib, const c
     // 获取目标函数地址
     void *handle = dlopen(target_lib, RTLD_LAZY);
     auto ori = (uintptr_t) dlsym(handle, target_func);
-    LOGE("ori addr: %" SCNxPTR "\n", ori);
+//    LOGE("ori addr: %" SCNxPTR "\n", ori);
     // 获取符号地址 (解析Segment)
     uintptr_t addrArray[MAX_ADDRARRAY_SIZE];
     int addrArraySize = getSymAddrDynamic(module_name, target_func, addrArray);

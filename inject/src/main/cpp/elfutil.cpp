@@ -126,8 +126,7 @@ int getSymAddrDynamic(const char *module_name, const char *symName, uintptr_t *a
         return 0;
     }
     uintptr_t DYNBase = moduleBase + DYNOffset;
-    LOGE("DYNOffset: %" SCNxPTR " DYNBase: %" SCNxPTR " DYNSize: %" SCNxPTR "", DYNOffset, DYNBase,
-         DYNSize);
+//    LOGE("DYNOffset: %" SCNxPTR " DYNSize: %" SCNxPTR "", DYNOffset, DYNSize);
 
     int addrArraySize = 0;
     // 保存各表
