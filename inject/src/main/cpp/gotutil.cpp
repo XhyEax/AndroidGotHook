@@ -55,8 +55,10 @@ int getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori, uintptr_t *ad
             addrArray[addrArraySize++] = addr;
         }
     }
+    if (addrArraySize == 0) {
+        LOGE("getSymAddrInGOT %" SCNxPTR " not found!\n", ori);
+    }
 
-    LOGE("getSymAddrInGOT %" SCNxPTR " not found!\n", ori);
     return addrArraySize;
 }
 
