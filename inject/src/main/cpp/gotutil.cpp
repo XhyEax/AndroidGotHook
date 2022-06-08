@@ -17,6 +17,8 @@
 #define PAGE_START(addr) ((addr) & PAGE_MASK)
 #define PAGE_END(addr)   (PAGE_START(addr) + PAGE_SIZE)
 
+#define MAX_ADDRARRAY_SIZE 32
+
 uintptr_t getGOTBase(int &GOTSize, const char *module_name) {
     uintptr_t GOTBase = 0;
     char moduleFullPath[256] = {0};
@@ -37,23 +39,25 @@ uintptr_t getGOTBase(int &GOTSize, const char *module_name) {
     return GOTBase;
 }
 
-uintptr_t getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori) {
+int getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori, uintptr_t *addrArray) {
     if (GOTBase == 0) {
         LOGE("getSymAddrInGOT failed! addr [%" SCNxPTR "] is wrong\n", GOTBase);
         return 0;
     }
 
+    int addrArraySize = 0;
+
     for (int i = 0; i < GOTSize; ++i) {
         uintptr_t addr = GOTBase + i * 4;
         uintptr_t item = *(uintptr_t *) (addr);
-//        LOGE("GOT [%d]: %" SCNxPTR "\n", i, item);
         if (item == ori) {
-            return addr;
+//            LOGE("GOT [%d]: %" SCNxPTR "\n", i, item);
+            addrArray[addrArraySize++] = addr;
         }
     }
 
     LOGE("getSymAddrInGOT %" SCNxPTR " not found!\n", ori);
-    return 0;
+    return addrArraySize;
 }
 
 void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori) {
@@ -92,9 +96,13 @@ uintptr_t hackBySection(const char *module_name, const char *target_lib, const c
     // 获取GOT表地址及大小 (解析Section)
     uintptr_t GOTBase = getGOTBase(GOTSize, module_name);
     // 遍历GOT表，查找符号地址
-    uintptr_t replaceAddr = getSymAddrInGOT(GOTBase, GOTSize, ori);
+    uintptr_t addrArray[MAX_ADDRARRAY_SIZE];
+    int addrArraySize = getSymAddrInGOT(GOTBase, GOTSize, ori, addrArray);
     // 替换地址
-    replaceFunction(replaceAddr, replace, ori);
+    for (int i = 0; i < addrArraySize; i++) {
+        uintptr_t replaceAddr = addrArray[i];
+        replaceFunction(replaceAddr, replace, ori);
+    }
     return ori;
 }
 
@@ -107,8 +115,12 @@ uintptr_t hackBySegment(const char *module_name, const char *target_lib, const c
     auto ori = (uintptr_t) dlsym(handle, target_func);
     LOGE("ori addr: %" SCNxPTR "\n", ori);
     // 获取符号地址 (解析Segment)
-    uintptr_t replaceAddr = getSymAddrDynamic(module_name, target_func);
+    uintptr_t addrArray[MAX_ADDRARRAY_SIZE];
+    int addrArraySize = getSymAddrDynamic(module_name, target_func, addrArray);
     // 替换地址
-    replaceFunction(replaceAddr, replace, ori);
+    for (int i = 0; i < addrArraySize; i++) {
+        uintptr_t replaceAddr = addrArray[i];
+        replaceFunction(replaceAddr, replace, ori);
+    }
     return ori;
 }

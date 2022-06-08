@@ -29,6 +29,6 @@ uintptr_t getModuleBase(const char *modulePath, char *moduleFullPath);
 
 int getGOTOffsetAndSize(const char *modulePath, int &GOTSize);
 
-uintptr_t getSymAddrDynamic(const char *moduleBase, const char *symName);
+int getSymAddrDynamic(const char *moduleBase, const char *symName, uintptr_t *addrArray);
 
 #endif //ANDROIDGOTHOOK_ELFUTIL_H

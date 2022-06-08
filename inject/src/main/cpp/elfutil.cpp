@@ -94,7 +94,7 @@ static uint32_t elf_sysv_hash(const uint8_t *name) {
 }
 
 // 解析Segment
-uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
+int getSymAddrDynamic(const char *module_name, const char *symName, uintptr_t *addrArray) {
     char moduleFullPath[256] = {0};
     uintptr_t moduleBase = getModuleBase(module_name, moduleFullPath);
     if (moduleBase == 0) {
@@ -129,6 +129,7 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
     LOGE("DYNOffset: %" SCNxPTR " DYNBase: %" SCNxPTR " DYNSize: %" SCNxPTR "", DYNOffset, DYNBase,
          DYNSize);
 
+    int addrArraySize = 0;
     // 保存各表
     ELFW(Sym) *dynsym;
     const char *dynstr;
@@ -222,7 +223,7 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             ELF_R_TYPE(rel.r_info) == ELF_R_JUMP_SLOT) {
 //            LOGE("target r_offset: %" SCNxPTR "", rel.r_offset);
-            return moduleBase + rel.r_offset;
+            addrArray[addrArraySize++] = moduleBase + rel.r_offset;
         }
     }
     for (int i = 0; i < rel_dyn_cnt; i++) {
@@ -235,8 +236,8 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
             (ELF_R_TYPE(rel.r_info) == ELF_R_ABS
              || ELF_R_TYPE(rel.r_info) == ELF_R_GLOB_DAT)) {
 //            LOGE("target r_offset: %" SCNxPTR "", rel.r_offset);
-            return moduleBase + rel.r_offset;
+            addrArray[addrArraySize++] = moduleBase + rel.r_offset;
         }
     }
-    return 0;
+    return addrArraySize;
 }

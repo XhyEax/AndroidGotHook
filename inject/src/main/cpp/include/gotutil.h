@@ -7,7 +7,7 @@
 
 uintptr_t getGOTBase(int &GOTSize, const char *modulePath);
 
-uintptr_t getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori);
+int getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori, uintptr_t *addrArray);
 
 void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori);
 
