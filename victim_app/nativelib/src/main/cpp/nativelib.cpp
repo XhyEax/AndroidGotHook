@@ -9,14 +9,19 @@
 
 #include "gotutil.h"
 
+typedef int (*getpid_fun)();
+
+// 全局函数指针
+getpid_fun global_getpid = (getpid_fun) getpid;
+
 // 原方法的备份
-int (*getpidOri)();
+getpid_fun getpidOri;
 
 // 替换方法
 int getpidReplace() {
     LOGI("before hook getpid\n");
     //调用原方法
-    int pid = (int) getpidOri();
+    int pid = getpidOri();
     LOGI("after hook getpid: %d\n", pid);
     return 23333;
 }
@@ -25,7 +30,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     // hackBySection or hackBySegment
     uintptr_t ori = hackBySegment("libnativelib.so", "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
-    getpidOri = (int (*)()) (ori);
+    getpidOri = (getpid_fun) ori;
     return JNI_VERSION_1_6;
 }
 
@@ -33,8 +38,15 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_xhy_nativelib_NativeLib_stringFromJNI(
         JNIEnv *env,
         jclass clazz) {
+    auto local_getpid = getpid;
     int pid = getpid();
-    LOGI("native-lib getpid: %d\n", pid);
-    std::string hello = std::to_string(pid);
-    return env->NewStringUTF(hello.c_str());
+    int local_pid = local_getpid();
+    int global_pid = global_getpid();
+
+    char buff[256];
+    sprintf(buff, "direct call: %d, local call: %d, global call: %d\n",
+            pid, local_pid, global_pid);
+    LOGI("%s", buff);
+
+    return env->NewStringUTF(buff);
 }
