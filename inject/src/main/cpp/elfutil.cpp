@@ -134,6 +134,8 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
     const char *dynstr;
     ELFW(Rel) *rel_dyn;
     ELFW(Rel) *rel_plt;
+    ELFW(Rela) *rela_dyn;
+    ELFW(Rela) *rela_plt;
     int rel_dyn_cnt, rel_plt_cnt;
     //.hash
     const uint32_t *buckets;
@@ -146,16 +148,24 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
     for (int i = 0; i < DYNSize / dyn_entsize; ++i) {
         memcpy(&dyn, (const void *) (DYNBase + i * dyn_entsize), dyn_entsize);
         switch (dyn.d_tag) {
-            // .rel.plt
+            // .rel.plt / .rela.plt
             case DT_JMPREL:
+#if defined(__LP64__)
+                rela_plt = (ELFW(Rela) *) (moduleBase + dyn.d_un.d_ptr);
+#else
                 rel_plt = (ELFW(Rel) *) (moduleBase + dyn.d_un.d_ptr);
+#endif
                 break;
             case DT_PLTRELSZ:
                 rel_plt_cnt = dyn.d_un.d_val / sizeof(ELFW(Rel));
                 break;
-                // .rel.dyn
+                // .rel.dyn / .rela.dyn
             case DT_REL:
+#if defined(__LP64__)
+                rela_dyn = (ELFW(Rela) *) (moduleBase + dyn.d_un.d_ptr);
+#else
                 rel_dyn = (ELFW(Rel) *) (moduleBase + dyn.d_un.d_ptr);
+#endif
                 break;
             case DT_RELSZ:
                 rel_dyn_cnt = dyn.d_un.d_val / sizeof(ELFW(Rel));
@@ -196,9 +206,13 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
         LOGE("target sym not found!");
         return 0;
     }
-    //遍历 .rel.plt 和 .rel.dyn，获取偏移，计算内存地址
+    //遍历 .rel.plt / .rela.plt 和 .rel.dyn / .rela.dyn，获取偏移，计算内存地址
     for (int i = 0; i < rel_plt_cnt; i++) {
+#if defined(__LP64__)
+        ELFW(Rela) &rel = rela_plt[i];
+#else
         ELFW(Rel) &rel = rel_plt[i];
+#endif
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             ELF_R_TYPE(rel.r_info) == ELF_R_JUMP_SLOT) {
 //            LOGE("target r_offset: %" SCNxPTR "", rel.r_offset);
@@ -206,7 +220,11 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
         }
     }
     for (int i = 0; i < rel_dyn_cnt; i++) {
+#if defined(__LP64__)
+        ELFW(Rela) &rel = rela_dyn[i];
+#else
         ELFW(Rel) &rel = rel_dyn[i];
+#endif
         if (&(dynsym[ELF_R_SYM(rel.r_info)]) == target &&
             (ELF_R_TYPE(rel.r_info) == ELF_R_ABS
              || ELF_R_TYPE(rel.r_info) == ELF_R_GLOB_DAT)) {
