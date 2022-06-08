@@ -27,8 +27,7 @@ int getpidReplace() {
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    // hackBySection or hackBySegment
-    uintptr_t ori = hackBySegment("libnativelib.so", "libc.so", "getpid",
+    uintptr_t ori = hackGOT("libnativelib.so", "libc.so", "getpid",
                                   (uintptr_t) getpidReplace);
     getpidOri = (getpid_fun) ori;
     return JNI_VERSION_1_6;

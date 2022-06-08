@@ -85,6 +85,11 @@ void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori) {
     __builtin___clear_cache((char *) PAGE_START(addr), (char *) PAGE_END(addr));
 }
 
+uintptr_t hackGOT(const char *module_name, const char *target_lib, const char *target_func,
+                  uintptr_t replace) {
+    // hackBySection or hackBySegment
+    return hackBySegment(module_name, target_lib, target_func, replace);
+}
 
 // 基于链接视图解析ELF
 uintptr_t hackBySection(const char *module_name, const char *target_lib, const char *target_func,

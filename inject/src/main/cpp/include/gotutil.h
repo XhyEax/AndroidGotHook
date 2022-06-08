@@ -11,6 +11,9 @@ int getSymAddrInGOT(uintptr_t GOTBase, int GOTSize, uintptr_t ori, uintptr_t *ad
 
 void replaceFunction(uintptr_t addr, uintptr_t replace, uintptr_t ori);
 
+uintptr_t hackGOT(const char *module_name, const char *target_lib, const char *target_func,
+                        uintptr_t replace);
+
 uintptr_t hackBySection(const char *module_name, const char *target_lib, const char *target_func,
                         uintptr_t replace);
 
