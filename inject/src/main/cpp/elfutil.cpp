@@ -157,10 +157,15 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
 #endif
                 break;
             case DT_PLTRELSZ:
+#if defined(__LP64__)
+                rel_plt_cnt = dyn.d_un.d_val / sizeof(ELFW(Rela));
+#else
                 rel_plt_cnt = dyn.d_un.d_val / sizeof(ELFW(Rel));
+#endif
                 break;
                 // .rel.dyn / .rela.dyn
             case DT_REL:
+            case DT_RELA:
 #if defined(__LP64__)
                 rela_dyn = (ELFW(Rela) *) (moduleBase + dyn.d_un.d_ptr);
 #else
@@ -168,6 +173,7 @@ uintptr_t getSymAddrDynamic(const char *module_name, const char *symName) {
 #endif
                 break;
             case DT_RELSZ:
+            case DT_RELASZ:
                 rel_dyn_cnt = dyn.d_un.d_val / sizeof(ELFW(Rel));
                 break;
                 // .dynsym
